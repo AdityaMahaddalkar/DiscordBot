@@ -6,6 +6,10 @@ var previous_max_price = 0.0;
 var ifunc = require('./interval_function');
 const Omega = '\u03A9';
 const rupee = '\u20A8';
+var emoji = require('node-emoji');
+emoji.get("coffee");
+console.log(emoji.find('pizza')['emoji']);
+
 client.once('ready', () => {
   console.log('Up and running!');
 });
@@ -26,6 +30,15 @@ client.on('message', message => {
       message.channel.send('PRICE: Price of Shattered Web Case is ' + item['median_price']);
     });
   }
+  else if(message.content === '!hungry') {
+    message.channel.send('FOOD: Have some ' + emoji.find('pizza')['emoji']);
+  }
+  else if(message.content === '!random') {
+    message.channel.send('RANDOM: Processing random emoji');
+    for (var i = 0;i < 10;i ++){
+      message.channel.send(emoji.random()['emoji']);
+    }
+  }
 });
 
 function execute_interval_function(){
@@ -34,7 +47,7 @@ function execute_interval_function(){
     client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
   }
   else{
-    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '--Interval Testing--');
+    //client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '--Interval Testing--');
   }
 }
 
