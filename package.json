@@ -1,0 +1,16 @@
+{
+  "name": "discord-js-example",
+  "version": "1.0.0",
+  "description": "Example for testing discord js API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aditya M",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "eslint": "^6.8.0",
+    "steam-market-pricing": "^2.0.0"
+  }
+}
