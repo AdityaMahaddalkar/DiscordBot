@@ -2,19 +2,23 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const market = require('steam-market-pricing');
 const api_token = process.env.DISCORD_BOT_TOKEN;
-var previous_max_price = 0.0;
 var ifunc = require('./interval_function');
 const Omega = '\u03A9';
 const rupee = '\u20A8';
-var emoji = require('node-emoji');
-emoji.get("coffee");
-console.log(emoji.find('pizza')['emoji']);
+const emoji = require('node-emoji');
+const sqlite3 = require('sqlite3').verbose()
+var previous_max_price;
+
+module.exports = {
+  execute_interval_function
+}
 
 client.once('ready', () => {
   console.log('Up and running!');
 });
 
-var status = client.login(api_token);
+var status = client.login(api_token).catch(err => {console.error("ERROR: " + err);});
+
 console.log(status);
 
 client.on('message', message => {
@@ -39,9 +43,37 @@ client.on('message', message => {
       message.channel.send(emoji.random()['emoji']);
     }
   }
+  else if(message.content === '!maxprice') {
+    let db = new sqlite3.Database('./db/Prices.db', (err) => {
+      if (err) throw err;
+      var sql_stmt = 'SELECT datetime, max(price) from swc;';
+      db.get(sql_stmt, [], (err, row) => {
+        if(err) throw err;
+        console.log(row);
+        var date = row['DATETIME'];
+        var price = row['max(price)'];
+        message.channel.send('--Maximum Price--')
+        message.channel.send('DATE TIME: ' + date);
+        message.channel.send('Price of Shattered Web Case: ' + rupee + ' ' + price);
+      });
+    });
+  }
 });
 
 function execute_interval_function(){
+
+  let db = new sqlite3.Database('./db/Prices.db', (err) => {
+    if (err) throw err;
+    console.log('LOG: Connected to Prices database');
+    var sql_stmt = 'SELECT max(price) from swc;';
+
+    db.get(sql_stmt, [], (err, row) => {
+      if (err) throw err;
+      console.log(row);
+      previous_max_price = row['max(price)'];
+    })
+  });
+
   var price, status = ifunc.intervalFunction(previous_max_price);
   if (status == true){
     client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
