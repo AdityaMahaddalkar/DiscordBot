@@ -60,26 +60,40 @@ client.on('message', message => {
   }
 });
 
-function execute_interval_function(){
+async function execute_interval_function(){
 
   let db = new sqlite3.Database('./db/Prices.db', (err) => {
-    if (err) throw err;
-    console.log('LOG: Connected to Prices database');
-    var sql_stmt = 'SELECT max(price) from swc;';
-
-    db.get(sql_stmt, [], (err, row) => {
+    try{
       if (err) throw err;
-      console.log(row);
-      previous_max_price = row['max(price)'];
-    })
+      console.log('LOG: Connected to Prices database');
+      var sql_stmt = 'SELECT max(price) from swc;';
+
+      db.get(sql_stmt, [], (err, row) => {
+        try{
+          if (err) throw err;
+          console.log(row);
+          previous_max_price = row['max(price)'];
+        }catch(err){
+          console.error("ERROR: " + err);
+        }
+      })
+    }catch(err){
+      console.error("ERROR: " + err);
+    }
   });
 
-  var price, status = ifunc.intervalFunction(previous_max_price);
+  var promise = await ifunc.intervalFunction(previous_max_price, testing=false);
+  console.log('LOG: [Promise] = ' + JSON.stringify(promise));
+  var status = promise[1];
+  var error = promise[2];
   if (status == true){
-    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
+    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
   }
-  else{
-    //client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(Omega + '--Interval Testing--');
+  else if(status == false && error != 5){
+    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('ok_hand')['emoji'] + '--Interval Testing--');
+  }
+  else if(error >= 5){
+    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('red_circle')['emoji'] + 'ERROR occured while querying Steam: Invalid item name');
   }
 }
 
@@ -88,3 +102,4 @@ var seconds = 60 * minutes;
 var milliseconds = 1000 * seconds;
 
 setInterval(execute_interval_function, milliseconds);
+//execute_interval_function();
