@@ -7,7 +7,7 @@ async function intervalFunction (previous_max_price, testing) {
   var status = 0;
 
   var promise = market.getItemPrice(730, 'Shattered Web Case', 24).then(function (item) {
-    current_price = parseFloat(item['median_price'].slice(2));
+    current_price = parseFloat(item['lowest_price'].slice(2));
     price_history = Date().toString() + ',' + current_price;
 
     if (testing == false){
@@ -30,7 +30,13 @@ async function intervalFunction (previous_max_price, testing) {
       });
     }
 
-    if (current_price >= (1.1 * previous_max_price)){
+    if (current_price >= 60) {
+      return [current_price, true, 0];
+    }
+    else if(current_price >= 50) {
+      return [current_price, true, 10];
+    }
+    else if (current_price >= (1.1 * previous_max_price)){
       previous_max_price = current_price;
       return [current_price, true, 1];
     }
