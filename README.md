@@ -1,4 +1,4 @@
-# Steam Community Market Price Tracker
+# Custom Discord Bot 
 
 ## Steam market price fetching
 
