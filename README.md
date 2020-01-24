@@ -1,4 +1,4 @@
-# Custom Discord Bot 
+# Custom Discord Bot
 
 ## Steam market price fetching
 
@@ -25,6 +25,13 @@ Current version 1.0.0 handles simple commands given as follows:
 - !hungry -----> *Bot gives random food emoji*
 - !price -----> *Bot outputs the item name and it's current median price*
 - !random -----> *Bot outputs 10 random emojis*
+- !newyorker-news -----> *Bot outputs 3 news articles from The NewYorker*
+- !newyorker-humor -----> *Bot outputs 3 humor tagged articles from The NewYorker*
+- !newyorker-culture -----> *Bot outputs 3 culture tagged articles from The NewYorker*
+- !newyorker-books -----> *Bot outputs 3 books tagged articles from The NewYorker*
+- !aldaily-articles -----> *Bot outputs 3 general articles from ALDaily*
+- !aldaily-books -----> *Bot outputs 3 books tagged articles from ALDaily*
+- !aldaily-essays -----> *Bot outputs 3 essays or letters from ALDaily*
 
 ---
 
