@@ -152,7 +152,7 @@ async function execute_interval_function(){
   var price = promise[0];
   var error = promise[2];
   if (status == true && error == 0) {
-    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
+    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case is currently ' + rupee + ' ' + price);
   }
   else if(status == true && error == 10) {
     client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case jumped to ' + rupee + ' ' + price);
