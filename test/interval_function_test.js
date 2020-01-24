@@ -10,6 +10,13 @@ describe('Interval Function', function() {
     assert.equal(promise[2], 1, "Code is 1");
   });
 
+  it('If previous_max_price > current_price then it should return status false and code 3', async function() {
+    var promise = await ifunc.intervalFunction(previous_max_price=100000, testing=true);
+    assert.equal(promise[1], false, "Status is false");
+    assert.equal(promise[2], 3, "Code is 3");
+  });
+
+  
   /*
   it('If current price >= previous max then it should replace previous max with current and false status', async function() {
     var max_price = 0;
@@ -38,9 +45,5 @@ describe('Interval Function', function() {
     assert.equal(promise[2], )
   });
   */
-  it('If previous_max_price > current_price then it should return status false and code 3', async function() {
-    var promise = await ifunc.intervalFunction(previous_max_price=100000, testing=true);
-    assert.equal(promise[1], false, "Status is false");
-    assert.equal(promise[2], 3, "Code is 3");
-  })
-})
+
+});
