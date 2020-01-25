@@ -1,4 +1,4 @@
-# Custom Discord Bot
+# :robot: Custom Discord Bot :computer:
 
 ## IBM Watson Assistant Integration
 
