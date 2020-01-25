@@ -1,5 +1,17 @@
 # Custom Discord Bot
 
+## IBM Watson Assistant Integration
+
+The Discord Bot is integrated with IBM Watson Assistant, which is currently working on custom dialogs present in the ./dialogs/bank_simple_workspace.json file. This is a simple assistant that processes input and extracts intents and special tokens such as dates and places and provides relevant output based on the same.
+
+This integration has very limited functionality and is pretty inaccurate as compared to state of the art chatbots. This is because the intent data provided is limited. Although, this bot is fully functional considering simple queries and provides pretty accurate responses if the query consists of special tokens.
+For more information visit [IBM Watson](https://cloud.ibm.com/docs/assistant?topic=assistant-getting-started).
+
+To access the assistant, mention the bot's name before typing your query in the discord channel. E.g.
+  - *@SteamMarketPrice what is today's schedule ?*
+
+---
+
 ## Steam market price fetching
 
 This program is designed to keep track of certain inventory items in Steam Market and notify the user when the price rises to a certain amount greater than the max amount till that time.
