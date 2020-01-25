@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const market = require('steam-market-pricing');
+const AssistantV2 = require('ibm-watson/assistant/v2');
+const { IamAuthenticator } = require('ibm-watson/auth');
 const api_token = process.env.DISCORD_BOT_TOKEN;
 var ifunc = require('./interval_function');
 const Omega = '\u03A9';
@@ -15,6 +17,14 @@ const newyorker_types = request_links.newyorker_types;
 const aldaily_types = request_links.aldaily_types;
 var previous_max_price;
 
+const assistant = new AssistantV2({
+  version: '2019-02-01',
+  authenticator: new IamAuthenticator({
+    apikey: process.env.ASSISTANT_IAM_APIKEY,
+  }),
+  url: process.env.ASSISTANT_URL,
+});
+
 module.exports = {
   execute_interval_function
 }
@@ -23,12 +33,60 @@ client.once('ready', () => {
   console.log('Up and running!');
 });
 
+async function start_convo() {
+  assistant.createSession({
+    assistantId: process.env.ASSISTANT_ID
+  }).then(res => {
+    console.log(JSON.stringify(res, null, 2));
+    let session_id = res['result']['session_id']
+    fs.writeFile('session_id.txt', session_id, function (err) {
+      if (err) console.log("Error while saving session_id");
+      else console.log('Saved SessionId!');
+    });
+  }).catch(err => {
+    console.log(err);
+  });
+}
+
 var status = client.login(api_token).catch(err => {console.error("ERROR: " + err);});
 
-console.log(status);
+//console.log(status);
 
 client.on('message', message => {
   console.log('Author: ' + message.author.username);
+
+  var author = message.author.username;
+  if(message.mentions.users.first() != undefined && message.mentions.users.first().username === 'SteamMarketPrice') {
+    // Start conversation
+    console.log('Mentions: ' + message.mentions.users.first().username);
+    try{
+      var final_message = message.content.replace('SteamMarketPrice','');
+      session_id = fs.readFileSync('session_id.txt').toString();
+      assistant.message({
+        assistantId: process.env.ASSISTANT_ID,
+        sessionId: session_id,
+        input: {
+          'message_type': 'text',
+          'text': final_message
+        }
+      }).then(res => {
+        console.log(JSON.stringify(res, null, 2));
+        output_text = res['result']['output']['generic'][0]['text'];
+        message.channel.send(output_text);
+      }).catch(err => {
+        console.log(err);
+      });
+
+      /*
+      send_message(final_message);
+      var output_message = fs.readFileSync('output_message.txt').toString();
+      message.channel.send(output_message);
+      */
+    }catch(err){
+      console.error(err);
+    }
+  }
+
   if (message.content === '!ping') {
     message.channel.send('Pong.');
   }
@@ -122,6 +180,12 @@ client.on('message', message => {
       message.channel.send(item);
     });
   }
+  else if(message.author.username === 'Arrow_123') {
+    message.channel.send('Man you are damn rude');
+  }
+  else if(message.content === 'good bot') {
+    message.channel.send('Thanks!!!!!!!!!!!');
+  }
 });
 
 async function execute_interval_function(){
@@ -155,7 +219,7 @@ async function execute_interval_function(){
     client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case is currently ' + rupee + ' ' + price);
   }
   else if(status == true && error == 10) {
-    client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case jumped to ' + rupee + ' ' + price);
+    //client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case jumped to ' + rupee + ' ' + price);
   }
   else if (status == true){
     client.channels.get(process.env.STEAM_MARKET_CHANNEL_ID).send(emoji.find('large_blue_circle')['emoji'] + '!Price of Shattered Web Case rose to ' + rupee + ' ' + price);
@@ -168,6 +232,29 @@ async function execute_interval_function(){
   }
 }
 
+async function send_message(input_text){
+  var session_id = fs.readFileSync('session_id.txt').toString()
+  assistant.message({
+    assistantId: process.env.ASSISTANT_ID,
+    sessionId: session_id,
+    input: {
+      'message_type': 'text',
+      'text': input_text
+    }
+  }).then(res => {
+    //console.log(JSON.stringify(res, null, 2));
+    output_text = res['result']['output']['generic']['text'];
+    fs.writeFile('output_message.txt', output_text, (err) => {
+      if (err) console.log("Error while writing output message");
+      else console.log("Output Message written successfully");
+    })
+  }).catch(err => {
+    console.log(err);
+  });
+}
+
+start_convo()
+
 var minutes = 2
 var seconds = 60 * minutes;
 var milliseconds = 1000 * seconds;
@@ -175,18 +262,23 @@ var milliseconds = 1000 * seconds;
 setInterval(execute_interval_function, milliseconds);
 //execute_interval_function();
 
-async function link_puller_scheduler() {
-  var out = schedule.scheduleJob('0 0 7 * * *', () => {
+async function scheduler() {
+  var out_links = schedule.scheduleJob('0 3 7 * * *', () => {
     console.log('LOG: Link Puller Schedule job at : ' + Date().toString());
     newyorker_types.forEach((item, i) => {
       request_links.request_newyorker(item);
       console.log('LOG: Pulled newyorker links');
     });
-    aldaily_types.forEach((item, i) => {
+    Object.keys(aldaily_types).forEach((item, i) => {
       request_links.request_aldaily(item);
       console.log('LOG: Pulled aldaily links');
     });
   });
+
+  var out_session = schedule.scheduleJob('*/5 * * * *', () => {
+    console.log('LOG: Session ID scheduler scheduled at: ' + Date().toString());
+    start_convo();
+  })
 }
 
-link_puller_scheduler();
+scheduler();
