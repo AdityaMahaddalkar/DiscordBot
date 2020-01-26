@@ -11,15 +11,6 @@ function request_newyorker(type) {
   }
   else{
     newyorker.get_body(type);
-    /*
-    var array = fs.readFileSync('newyorker_'+type+'_links.txt').toString().split('\n');
-    shuffle(array);
-    var three_links = array.slice(0, 3);
-
-    three_links.forEach((item, i) => {
-      console.log('links: ' + item);
-    });
-    */
     return null;
   }
 }
@@ -29,15 +20,7 @@ function request_aldaily(type) {
     return new Error('Type invalid');
   }
   else {
-    /*
     aldaily.get_body(type);
-    var array = fs.readFileSync('aldaily_'+type+'_links.txt').toString().split('\n');
-    shuffle(array);
-    var three_links = array.slice(0, 3);
-    three_links.forEach((item, i) => {
-      console.log('links: ' + item);
-    });
-    */
     return null;
   }
 }
