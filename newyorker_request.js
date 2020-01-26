@@ -17,9 +17,11 @@ function get_body(type) {
     //onsole.error("ERROR: " + err);
     //console.log("Status Code: " + response.statusCode);
     //console.log("Body Type: " + typeof(body));
+    /*
     fs.writeFile('newyorker.html', pretty(body), (err) => {
       if (err) console.error("Error: " + err);
     });
+    */
     parse_body(body, type);
   });
 }
@@ -46,7 +48,7 @@ function parse_body (body, type) {
     item += '\n';
     links_string += item;
   });
-  fs.writeFile('newyorker_'+type+'_links.txt', links_string, (err) => {
+  fs.writeFile('weblinks/newyorker_'+type+'_links.txt', links_string, (err) => {
     if (err) console.error("ERROR: NewYorker file write : " + err);
     //console.log("FILE writing successful");
   })
