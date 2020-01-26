@@ -10,9 +10,12 @@ const rupee = '\u20A8';
 const emoji = require('node-emoji');
 const shuffle = require('shuffle-array');
 const sqlite3 = require('sqlite3').verbose();
+const meme_fetcher = require('./meme_fetcher');
+var subreddits = meme_fetcher.subreddits;
 const schedule = require('node-schedule');
 const request_links = require('./request_links');
 const fs = require('fs');
+const IMAGE_OUTPUT_FOLDER = 'images/';
 const newyorker_types = request_links.newyorker_types;
 const aldaily_types = request_links.aldaily_types;
 var previous_max_price;
@@ -37,7 +40,7 @@ async function start_convo() {
   assistant.createSession({
     assistantId: process.env.ASSISTANT_ID
   }).then(res => {
-    console.log(JSON.stringify(res, null, 2));
+    //console.log(JSON.stringify(res, null, 2));
     let session_id = res['result']['session_id']
     fs.writeFile('session_id.txt', session_id, function (err) {
       if (err) console.log("Error while saving session_id");
@@ -70,7 +73,7 @@ client.on('message', message => {
           'text': final_message
         }
       }).then(res => {
-        console.log(JSON.stringify(res, null, 2));
+        //console.log(JSON.stringify(res, null, 2));
         output_text = res['result']['output']['generic'][0]['text'];
         message.channel.send(output_text);
       }).catch(err => {
@@ -123,8 +126,27 @@ client.on('message', message => {
       });
     });
   }
+  else if(message.content === '!dankmemes') {
+    //Get meme file
+    message.channel.send('Fetching a dank meme for ya...');
+    fs.readdir(IMAGE_OUTPUT_FOLDER, (err, files) => {
+      console.log('LOG: Request for dank memes');
+      shuffle(files);
+      //send file on channel
+      message.channel.send("Here's a dank meme: ", {
+        files: [IMAGE_OUTPUT_FOLDER+files[0]]
+      });
+      /*
+      files.forEach((item, i) => {
+        console.log(item);
+      });
+      */
+
+    })
+
+  }
   else if(message.content === '!newyorker-news') {
-    var array = fs.readFileSync('newyorker_news_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/newyorker_news_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -132,7 +154,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!newyorker-humor') {
-    var array = fs.readFileSync('newyorker_humor_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/newyorker_humor_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -141,7 +163,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!newyorker-books') {
-    var array = fs.readFileSync('newyorker_books_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/newyorker_books_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -149,7 +171,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!newyorker-culture') {
-    var array = fs.readFileSync('newyorker_culture_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/newyorker_culture_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -157,7 +179,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!aldaily-articles') {
-    var array = fs.readFileSync('aldaily_articles_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/aldaily_articles_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -165,7 +187,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!aldaily-books') {
-    var array = fs.readFileSync('aldaily_books_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/aldaily_books_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -173,7 +195,7 @@ client.on('message', message => {
     });
   }
   else if(message.content === '!aldaily-essays') {
-    var array = fs.readFileSync('aldaily_essays_links.txt').toString().split('\n');
+    var array = fs.readFileSync('weblinks/aldaily_essays_links.txt').toString().split('\n');
     shuffle(array);
     var three_links = array.slice(0, 3);
     three_links.forEach((item, i) => {
@@ -181,11 +203,12 @@ client.on('message', message => {
     });
   }
   else if(message.author.username === 'Arrow_123') {
-    message.channel.send('Man you are damn rude');
+    //message.channel.send('Man you are damn rude');
   }
   else if(message.content === 'good bot') {
     message.channel.send('Thanks!!!!!!!!!!!');
   }
+
 });
 
 async function execute_interval_function(){
@@ -254,6 +277,7 @@ async function send_message(input_text){
 }
 
 start_convo()
+meme_fetcher.fetch_json(subreddits[0]);
 
 var minutes = 2
 var seconds = 60 * minutes;
@@ -278,6 +302,11 @@ async function scheduler() {
   var out_session = schedule.scheduleJob('*/5 * * * *', () => {
     console.log('LOG: Session ID scheduler scheduled at: ' + Date().toString());
     start_convo();
+  });
+
+  var out_reddit_api = schedule.scheduleJob('0 * * * *', () => {
+    console.log("LOG: Meme fetcher scheduled job at: " + Date().toString());
+    meme_fetcher.fetch_json(subreddits[0]);
   })
 }
 
