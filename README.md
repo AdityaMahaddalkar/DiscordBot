@@ -1,8 +1,8 @@
-# Custom Discord Bot
+# :robot: Custom Discord Bot :computer:
 
 ## IBM Watson Assistant Integration
 
-The Discord Bot is integrated with IBM Watson Assistant, which is currently working on custom dialogs present in the ./dialogs/bank_simple_workspace.json file. This is a simple assistant that processes input and extracts intents and special tokens such as dates and places and provides relevant output based on the same.
+The Discord Bot is integrated with IBM Watson Assistant, which is currently working on custom dialogs present in the ./dialog/bank_simple_workspace.json file. This is a simple assistant that processes input and extracts intents and special tokens such as dates and places and provides relevant output based on the same.
 
 This integration has very limited functionality and is pretty inaccurate as compared to state of the art chatbots. This is because the intent data provided is limited. Although, this bot is fully functional considering simple queries and provides pretty accurate responses if the query consists of special tokens.
 For more information visit [IBM Watson](https://cloud.ibm.com/docs/assistant?topic=assistant-getting-started).
