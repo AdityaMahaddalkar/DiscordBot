@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 const IMAGE_OUTPUT_FOLDER = '../images/';
 var subreddits = ['r/dankmemes'];
 
-var download = function(uri, filename, callback){
+var download = function(uri, filename, output_folder, callback){
   request.head(uri, function(err, res, body){
     //console.log('content-type:', res.headers['content-type']);
     //console.log('content-length:', res.headers['content-length']);
@@ -28,19 +28,20 @@ var download = function(uri, filename, callback){
     else {
       console.log('Extension not yet known');
     }
-    request(uri).pipe(fs.createWriteStream(filename+extension)).on('close', callback);
+    request(uri).pipe(fs.createWriteStream(output_folder+filename+extension)).on('close', callback);
   });
 };
 
-function fetch_json(subreddit) {
-fetch(REDDIT_URL+subreddit+'?sort=hot&limit=100')
+function fetch_json(subreddit, output_folder) {
+  fetch(REDDIT_URL+subreddit+'?sort=hot&limit=100')
   .then(response => response.json())
   .then(response => {
-    parse_body(response);
+    parse_body(response, output_folder);
   });
+  console.log('LOG: Memes saved to :' + output_folder);
 }
 
-function parse_body(body) {
+function parse_body(body, output_folder) {
   var image_urls = [];
   try{
     body['data']['children'].forEach((item, i) => {
@@ -49,7 +50,7 @@ function parse_body(body) {
     console.log('Fetching dank memes');
     image_urls.forEach((item, i) => {
       //console.log(item);
-      download(item, IMAGE_OUTPUT_FOLDER+i, () => {
+      download(item, i, output_folder, () => {
         //console.log('Done ' + item);
       })
     });

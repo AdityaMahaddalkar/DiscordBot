@@ -15,7 +15,7 @@ var subreddits = meme_fetcher.subreddits;
 const schedule = require('node-schedule');
 const request_links = require('./utils/request_links');
 const fs = require('fs');
-const IMAGE_OUTPUT_FOLDER = 'images/';
+const IMAGE_OUTPUT_FOLDER = './images/';
 const newyorker_types = request_links.newyorker_types;
 const aldaily_types = request_links.aldaily_types;
 var previous_max_price;
@@ -53,8 +53,6 @@ async function start_convo() {
 
 var status = client.login(api_token).catch(err => {console.error("ERROR: " + err);});
 
-//console.log(status);
-
 client.on('message', message => {
   console.log('Author: ' + message.author.username);
 
@@ -79,12 +77,6 @@ client.on('message', message => {
       }).catch(err => {
         console.log(err);
       });
-
-      /*
-      send_message(final_message);
-      var output_message = fs.readFileSync('output_message.txt').toString();
-      message.channel.send(output_message);
-      */
     }catch(err){
       console.error(err);
     }
@@ -136,14 +128,7 @@ client.on('message', message => {
       message.channel.send("Here's a dank meme: ", {
         files: [IMAGE_OUTPUT_FOLDER+files[0]]
       });
-      /*
-      files.forEach((item, i) => {
-        console.log(item);
-      });
-      */
-
-    })
-
+    });
   }
   else if(message.content === '!newyorker-news') {
     var array = fs.readFileSync('weblinks/newyorker_news_links.txt').toString().split('\n');
@@ -209,6 +194,8 @@ client.on('message', message => {
     message.channel.send('Thanks!!');
   }
 
+}).on('error', err =>{
+  console.error("ERROR: " + err);
 });
 
 async function execute_interval_function(){
@@ -277,7 +264,7 @@ async function send_message(input_text){
 }
 
 start_convo()
-meme_fetcher.fetch_json(subreddits[0]);
+meme_fetcher.fetch_json(subreddits[0], IMAGE_OUTPUT_FOLDER);
 
 var minutes = 2
 var seconds = 60 * minutes;
@@ -306,7 +293,7 @@ async function scheduler() {
 
   var out_reddit_api = schedule.scheduleJob('0 * * * *', () => {
     console.log("LOG: Meme fetcher scheduled job at: " + Date().toString());
-    meme_fetcher.fetch_json(subreddits[0]);
+    meme_fetcher.fetch_json(subreddits[0], IMAGE_OUTPUT_FOLDER);
   })
 }
 
