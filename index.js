@@ -4,16 +4,16 @@ const market = require('steam-market-pricing');
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const { IamAuthenticator } = require('ibm-watson/auth');
 const api_token = process.env.DISCORD_BOT_TOKEN;
-var ifunc = require('./interval_function');
+var ifunc = require('./utils/interval_function');
 const Omega = '\u03A9';
 const rupee = '\u20A8';
 const emoji = require('node-emoji');
 const shuffle = require('shuffle-array');
 const sqlite3 = require('sqlite3').verbose();
-const meme_fetcher = require('./meme_fetcher');
+const meme_fetcher = require('./utils/meme_fetcher');
 var subreddits = meme_fetcher.subreddits;
 const schedule = require('node-schedule');
-const request_links = require('./request_links');
+const request_links = require('./utils/request_links');
 const fs = require('fs');
 const IMAGE_OUTPUT_FOLDER = 'images/';
 const newyorker_types = request_links.newyorker_types;
@@ -206,7 +206,7 @@ client.on('message', message => {
     //message.channel.send('Man you are damn rude');
   }
   else if(message.content === 'good bot') {
-    message.channel.send('Thanks!!!!!!!!!!!');
+    message.channel.send('Thanks!!');
   }
 
 });
