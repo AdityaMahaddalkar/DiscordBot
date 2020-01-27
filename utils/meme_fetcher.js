@@ -2,7 +2,7 @@ const request = require('request');
 const fs = require('fs');
 const REDDIT_URL = 'https://api.reddit.com/';
 const fetch = require("node-fetch");
-const IMAGE_OUTPUT_FOLDER = 'images/';
+const IMAGE_OUTPUT_FOLDER = '../images/';
 var subreddits = ['r/dankmemes'];
 
 var download = function(uri, filename, callback){
